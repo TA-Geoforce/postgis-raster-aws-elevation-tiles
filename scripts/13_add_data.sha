@@ -1,0 +1,16 @@
+#!/bin/bash
+
+set -e
+
+aws --version
+
+# Perform all actions as $POSTGRES_USER
+export PGUSER="$POSTGRES_USER"
+export PGPASSWORD="$POSTGRES_PASSWORD"
+export AWS_NO_SIGN_REQUEST=YES
+export GTIFF_DIRECT_IO=YES
+
+for ((i = 1; i <= $MAX_ZOOM_LEVEL; i++)); do
+    echo "Zoom level $i"
+    aws s3 ls --no-sign-request s3://elevation-tiles-prod/v2/geotiff/$i/ --recursive | awk '{print "raster2pgsql -a -s 3857 -R -t 256x256 -k -Y /vsis3/elevation-tiles-prod/" $4 " elevation_tiles_prod | psql -p 5432 -d postgres"}' | bash
+done

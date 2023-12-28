@@ -1,0 +1,33 @@
+{
+    "name": "react-leaflet-postgis-raster",
+    "version": "1.0.0",
+    "description": "",
+    "keywords": [],
+    "main": "src/index.js",
+    "dependencies": {
+        "leaflet": "1.9.3",
+        "loader-utils": "3.2.1",
+        "react": "18.2.0",
+        "react-dom": "18.2.0",
+        "react-leaflet": "4.2.0",
+        "react-leaflet-custom-control": "^1.4.0",
+        "react-leaflet-draw": "^0.20.4",
+        "react-scripts": "^5.0.1"
+    },
+    "devDependencies": {
+        "@babel/runtime": "7.13.8",
+        "typescript": "4.1.3"
+    },
+    "scripts": {
+        "start": "react-scripts start",
+        "build": "react-scripts build",
+        "test": "react-scripts test --env=jsdom",
+        "eject": "react-scripts eject"
+    },
+    "browserslist": [
+        ">0.2%",
+        "not dead",
+        "not ie <= 11",
+        "not op_mini all"
+    ]
+}

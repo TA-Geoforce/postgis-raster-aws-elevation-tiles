@@ -1,0 +1,65 @@
+version: '3'
+
+services:
+  react-app:
+    image: node:16-alpine
+    restart: unless-stopped
+    user: "node"
+    ports:
+      - "3000:3000"
+    working_dir: /home/node/app
+    volumes:
+      - ./react-leflet-v3-app:/home/node/app
+    command: "npm start"
+    depends_on:
+      - app
+
+  app:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.springboot
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://postgis-raster-aws-elevation-tiles-db-1:5432/postgres
+    ports:
+      - "8080:8080"
+    depends_on:
+      - db
+    command:
+      bash -c "bash /tmp/scripts/wait-for-it.sh postgis-raster-aws-elevation-tiles-db-1:5432 --timeout=30 && /start.sh"
+    volumes:
+      - ./dockerfiles/scripts:/tmp/scripts
+    networks:
+      - mynet
+
+  db:
+    build:
+      context: .
+      dockerfile: dockerfiles/Dockerfile.db
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      MAX_ZOOM_LEVEL: 5
+    ports:
+      - "5432:5432"
+    command:
+      - "postgres"
+      - "-c"
+      - "postgis.enable_outdb_rasters=TRUE"
+      - "-c"
+      - "postgis.gdal_enabled_drivers=ENABLE_ALL"
+      - "-c"
+      - "postgis.gdal_vsi_options=AWS_NO_SIGN_REQUEST=yes GDAL_HTTP_MULTIPLEX=yes GDAL_DISABLE_READDIR_ON_OPEN=EMPTY_DIR GDAL_HTTP_MERGE_CONSECUTIVE_RANGES=yes GDAL_HTTP_MULTIPLEX=yes VSI_CACHE=true"
+    #volumes:
+      #- ./.pgdata:/var/lib/postgresql/data
+    networks:
+      - mynet
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+networks:
+  mynet:
+    name: my-shared-db-network
