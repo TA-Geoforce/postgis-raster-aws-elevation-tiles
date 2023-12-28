@@ -94,9 +94,9 @@ docker compose up
 docker compose down -v --rmi local
 ```
 
-## Available endpoints
+## TMS and Statistical endpoints
 
-We are supporting statistics and general png tilling service by raster processing: DEM (Elevation)
+We are supporting Tile Map Service [TMS](https://en.wikipedia.org/wiki/Tile_Map_Service) and statistical endpoints by raster processing: DEM (Elevation)
 More information here <https://postgis.net/docs/RT_reference.html#Raster_Processing_DEM>
 
 To check the available endpoints, please, check out here [elevation-tiles-controller](http://localhost:8080/swagger-ui/index.html)
@@ -110,6 +110,10 @@ To check the available endpoints, please, check out here [elevation-tiles-contro
 cd springboot
 mvn spring-boot:run
 ```
+
+## Using custom color ramps
+
+Here the limits are endless, since for every type of layer `elevation`, `slope`, `tri`, `tpi`, `hillshade`, `aspect`, besides the TMS `{z}/{x}/{y}` you can specify the `coloramp`, by passing in `pg` format (Color-maps used by PostGIS, in particular those for the ST_ColorMap function). The best color ramps I found are here -> [cpt-city](http://soliton.vm.bytemark.co.uk/pub/cpt-city/)
 
 ## Benchmark
 
