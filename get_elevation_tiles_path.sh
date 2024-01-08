@@ -4,8 +4,8 @@ export PGUSER=postgres
 export PGPASSWORD=postgres
 export AWS_NO_SIGN_REQUEST=YES
 export GTIFF_DIRECT_IO=YES
-export MAX_ZOOM_LEVEL=9
-export MIN_ZOOM_LEVEL=9
+export MAX_ZOOM_LEVEL=10
+export MIN_ZOOM_LEVEL=10
 
 count=0
 
