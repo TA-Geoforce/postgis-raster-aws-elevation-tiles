@@ -105,43 +105,6 @@ public interface ElevationTilesProdRepository extends JpaRepository<ElevationTil
                 FROM elevation_tiles_prod
             WHERE z= :z AND x= :x AND y= :y
             """, nativeQuery = true)
-    byte[] getHillShadeOnlyTile(@Param("z") int z, @Param("x") int x, @Param("y") int y,  @Param("colormap") String colormap);
-
-    @Query(value = """
-            WITH metadata_tile AS (
-                SELECT
-                    ST_Envelope(rast) AS envelope,
-            (ST_MetaData(rast)).*
-                FROM
-                    elevation_tiles_prod
-                WHERE
-                    z = :z
-                    AND x = :x
-                    AND y = :y
-            ),
-            buffered_envelope AS (
-                SELECT
-                    ST_Buffer(mt.envelope, mt.scalex*100) AS geom
-                FROM
-                    metadata_tile mt
-            ),
-            clipped AS (
-                SELECT
-                    ST_Clip(St_Union(rast), bf.geom) AS rast
-                FROM
-                    elevation_tiles_prod etp,
-                    buffered_envelope bf
-                WHERE
-                    ST_Intersects(etp.rast, bf.geom)
-                    AND z = :z
-                GROUP BY
-                    bf.geom
-            )
-            SELECT
-                ST_AsPNG(ST_ColorMap(ST_HillShade(rast), 1, :colormap))
-            FROM
-                clipped
-            """, nativeQuery = true)
     byte[] getHillShade(@Param("z") int z, @Param("x") int x, @Param("y") int y,  @Param("colormap") String colormap);
 
     @Query(value = """
