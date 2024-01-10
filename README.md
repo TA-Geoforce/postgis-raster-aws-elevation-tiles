@@ -5,6 +5,10 @@ PoC using PostGIS Raster extension with Terrain Tiles, an AWS open dataset of el
 ![Preview](/images/aws_elevation_preview.webp)
 *Figure 1. Preview application using Leaflet*
 
+## Architecture
+
+![Architecture](/images/architecture.png)
+
 ## AWS Open Data
 
 We are using Terrain Tiles, an open dataset from AWS, more details [here](https://registry.opendata.aws/terrain-tiles/)
@@ -68,7 +72,9 @@ export PGPASSWORD=postgres
 export AWS_NO_SIGN_REQUEST=YES
 export GTIFF_DIRECT_IO=YES
 
-parallel --jobs 1000 -a tiles.txt raster2pgsql -a -s 3857 -R -t 256x256 -k -Y {} elevation_tiles_prod | psql -h localhost -p 5432 -U postgres -d postgres
+ulimit -n `ulimit -Hn`
+
+parallel --jobs 600 -a tiles.txt raster2pgsql -a -s 3857 -R -t 256x256 -k -Y {} elevation_tiles_prod | psql -h localhost -p 5432 -U postgres -d postgres
 ```
 
 *For zoom level 7 we added 16.369 from the 16.384 tiles in 20 minutes.
