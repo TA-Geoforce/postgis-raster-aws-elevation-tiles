@@ -19,7 +19,7 @@ If you want to to produce all the `s3` uri for a specific zoom level, you can us
 aws s3 ls --no-sign-request s3://elevation-tiles-prod/v2/geotiff/15/ --recursive | awk '{print $4}' | sed 's/^/\/vsis3\/elevation-tiles-prod\//' > elevation-tiles-prod.txt
 ```
 
-## PostGis Raster
+## PostGIS Raster
 
 Postgres/PostGis is extended with raster capabilities using under the hood GDAL. More information here:
 
