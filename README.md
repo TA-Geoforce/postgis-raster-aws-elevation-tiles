@@ -133,24 +133,60 @@ oha  "http://localhost:8080/api/v1/elevation/0/0/0?colormap=pseudocolor"
 
 ### Results
 
+We run the docker cluster in an EC2 instance Region `us-east-1` (same as the s3 bucket is)
+
+we used 1000 requests in zoom level 9 and randomly keep x and y tiles from range [0...256]
+
+#### Single tile elevation
+
+```bash
+oha -n 1000 --rand-regex-url "http://localhost:8080/api/v1/elevation/9/([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
+```
+
 ![Single tile elevation](/images/benchmark-elevation.png)
 *Figure 3. Single tile elevation request*
+
+#### Single tile elevation with color-ramp
+
+```bash
+# no regex here due the `filter` but number of connections to run concurrently = 100 (50 default) and number of parallel requests to send on HTTP/2 = 10 (1 default)
+oha -n 1000 -c 100 -p 10 "http://localhost:8080/api/v1/elevation/9/0/0?colormap=pseudocolor"
+```
 
 ![Single tile elevation rendering with a coloramp](/images/benchmark-elevation-coloramp.png)
 *Figure 4. Single tile elevation rendering with a coloramp*
 
+#### Single elevation tile statistics request
+
+```bash
+oha -n 1000  http://localhost:8080/api/v1/elevation-statistics/9/0/1
+```
+
 ![Statistics of elevation tile](/images/benchmark-elevation-statistics.png)
 *Figure 5. Single elevation tile statistics request*
 
+### Elevation statistics from 4 tiles (zoom level 4), by specific extend
+
+```bash
+# no regex here due the `filter` but number of connections to run concurrently = 100 (50 default) and number of parallel requests to send on HTTP/2 = 10 (1 default), the zoom level is 1 and the extent is the whole world, clipped by 1 degree.
+oha -n 1000 -c 100 -p 10 "http://localhost:8080/api/v1/elevation-statistics/1/-178,-89,178,89"
+```
+
 ![Statistics by zoom level and extend](/images/bechmark-elevation-statistics-extend.png)
 *Figure 6. Elevation statistics from 4 tiles (zoom level 4), by specific extend*
+
+### Slope request of single tile
+
+```bash
+oha -n 1000 --rand-regex-url "http://localhost:8080/api/v1/slope/9/([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])/([0-9]|[1-9][0-9]|1[0-9]{2}|2[0-4][0-9]|25[0-5])"
+```
 
 ![Slope single tile](/images/bechmark-slope.png)
 *Figure 7. Slope request of single tile*
 
 From figures 3-7 we can conclude that: **PostGis Raster using `outdb` rasters stored in `S3` works and performs very well**
 
-*Tip: For better benchmarking it would have been better to have our own clone of terrain-tiles in `S3` and the `Postgres` and `SpringBoot` should be in separated EC2 instances, located in the same region as the S3 bucket.*
+*Tip: For better benchmarking it would have been better to have our own clone of terrain-tiles in `S3`*
 
 ## Conclusions
 
